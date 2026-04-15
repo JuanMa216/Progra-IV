@@ -62,7 +62,11 @@ def guardar_json(sistema):
 
 def cargar_json(sistema):
     print("\n--- CARGAR DESDE JSON ---")
-    sistema.cargarJSON()
+    confirmacion = input("¿Seguro? Los cambios no guardados se perderan (y/n): ").strip().lower()
+    if confirmacion == "y":
+        sistema.cargarJSON()
+    else:
+        print("Carga cancelada.")
 
 
 def mostrar_menu():

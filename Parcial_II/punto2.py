@@ -75,7 +75,7 @@ class PacienteUrgencia(Paciente):
         self.__nivelDeGravedad = nivelDeGravedad
     @property
     def nivelDeGravedad(self):
-        return self.nivelDeGravedad
+        return self.__nivelDeGravedad
     @nivelDeGravedad.setter
     def nivelDeGravedad(self, nivelDeGravedad: str):
         self.__nivelDeGravedad = nivelDeGravedad
@@ -117,10 +117,11 @@ class Sistema:
     def atenderPaciente(self):
         orden = [PacienteUrgencia, PacientePrioritario, PacienteGeneral]
         for tipo in orden:
-            if isinstance(p, tipo) and p.estadoDeAtencion != "Atendido":
-                p.estadoDeAtencion = "Atendido"
-                print(f"Paciente {p.nombre} atendido exitosamente.")
-                return True
+            for p in self.pacientes:
+                if isinstance(p, tipo) and p.estadoDeAtencion != "Atendido":
+                    p.estadoDeAtencion = "Atendido"
+                    print(f"Paciente {p.nombre} atendido exitosamente.")
+                    return True
         print("No hay pacientes pendientes.")
 
     #Validaciones
@@ -157,6 +158,7 @@ class Sistema:
         try:
             with open(archivo, "r", encoding="utf-8") as f:
                 datos = json.load(f)
+            self.pacientes = []
             for d in datos:
                 tipo = d["tipo"]
                 if tipo == "PacienteGeneral":
