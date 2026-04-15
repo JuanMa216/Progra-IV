@@ -1,14 +1,57 @@
-# main.py
-from punto2 import Sistema, PacienteGeneral, PacientePrioritario, PacienteUrgencia
+from models import PacienteGeneral, PacientePrioritario, PacienteUrgencia
+from services import guardarJSON, cargarJSON
+
+class Sistema:
+    def __init__(self):
+        self.pacientes = []
+
+    def registrarPaciente(self, paciente):
+        if self._documentoExiste(paciente.documento):
+            print("Error: ya existe un paciente con este documento.")
+            return False
+        if not self._validarEdad(paciente.edad):
+            print("Error: edad inválida.")
+            return False
+        self.pacientes.append(paciente)
+        print(f"Paciente {paciente.nombre} registrado exitosamente.")
+        return True
+
+    def mostrarPacientes(self):
+        if not self.pacientes:
+            print("No hay pacientes registrados.")
+            return
+        for p in self.pacientes:
+            print(p)
+
+    def buscarPaciente(self, documento: int):
+        for p in self.pacientes:
+            if p.documento == documento:
+                return p
+        print(f"No se encontró ningún paciente con el documento {documento}.")
+        return None
+
+    def atenderSiguiente(self):
+        orden = [PacienteUrgencia, PacientePrioritario, PacienteGeneral]
+        for tipo in orden:
+            for p in self.pacientes:
+                if isinstance(p, tipo) and p.estadoDeAtencion != "Atendido":
+                    p.estadoDeAtencion = "Atendido"
+                    print(f"Paciente {p.nombre} atendido exitosamente.")
+                    return True
+        print("No hay pacientes pendientes.")
+
+    def _documentoExiste(self, documento: int) -> bool:
+        return any(p.documento == documento for p in self.pacientes)
+
+    def _validarEdad(self, edad: int) -> bool:
+        return 0 <= edad <= 120
+
+#Menu
 
 def registrar_paciente(sistema):
     print("\n--- REGISTRAR PACIENTE ---")
-    print("Tipo de paciente:")
-    print("1. General")
-    print("2. Prioritario")
-    print("3. Urgencias")
+    print("1. General  2. Prioritario  3. Urgencias")
     tipo = input("Seleccione el tipo: ").strip().lower()
-
     try:
         documento = int(input("Documento: "))
         nombre = input("Nombre: ").strip()
@@ -16,63 +59,36 @@ def registrar_paciente(sistema):
     except ValueError:
         print("Error: documento y edad deben ser números enteros.")
         return
-
     if tipo == "1" or tipo == "general":
         eps = input("Nombre de la EPS: ").strip()
         paciente = PacienteGeneral(documento, nombre, edad, "Pendiente", eps)
     elif tipo == "2" or tipo == "prioritario":
         condicion = input("Condición especial: ").strip()
-        paciente = PacientePrioritario(documento, nombre, edad, "Pendiente", condicion)     
+        paciente = PacientePrioritario(documento, nombre, edad, "Pendiente", condicion)
     elif tipo == "3" or tipo == "urgencias":
         gravedad = input("Nivel de gravedad: ").strip()
         paciente = PacienteUrgencia(documento, nombre, edad, "Pendiente", gravedad)
     else:
-        print("Tipo de paciente inválido.")
+        print("Tipo inválido.")
         return
-
     sistema.registrarPaciente(paciente)
-
-
-def mostrar_pacientes(sistema):
-    print("\n--- LISTA DE PACIENTES ---")
-    sistema.mostrarPacientes()
-
-
-def buscar_paciente(sistema):
-    print("\n--- BUSCAR PACIENTE ---")
-    try:
-        documento = int(input("Ingrese el documento a buscar: "))
-    except ValueError:
-        print("Error: el documento debe ser un número entero.")
-        return
-    paciente = sistema.buscarPaciente(documento)
-    if paciente:
-        print(paciente)
-
-
-def atender_paciente(sistema):
-    print("\n--- ATENDER SIGUIENTE PACIENTE ---")
-    sistema.atenderPaciente()
-
 
 def guardar_json(sistema):
     print("\n--- GUARDAR EN JSON ---")
-    sistema.guardarJSON()
-
+    guardarJSON(sistema.pacientes)
 
 def cargar_json(sistema):
     print("\n--- CARGAR DESDE JSON ---")
-    confirmacion = input("¿Seguro? Los cambios no guardados se perderan (y/n): ").strip().lower()
-    if confirmacion == "y":
-        sistema.cargarJSON()
+    confirmacion = input("¿Seguro? Los cambios no guardados se perderán (s/n): ").strip().lower()
+    if confirmacion == "s":
+        sistema.pacientes = cargarJSON()
     else:
         print("Carga cancelada.")
-
 
 def mostrar_menu():
     print("\n=============================")
     print("   SISTEMA DE ATENCIÓN       ")
-    print("       CLÍNICA               ")
+    print("         CLÍNICA             ")
     print("=============================")
     print("1. Registrar paciente")
     print("2. Mostrar todos los pacientes")
@@ -83,22 +99,25 @@ def mostrar_menu():
     print("0. Salir")
     print("=============================")
 
-
 def main():
     sistema = Sistema()
-
     while True:
         mostrar_menu()
         opcion = input("Seleccione una opción: ").strip()
-
         if opcion == "1":
             registrar_paciente(sistema)
         elif opcion == "2":
-            mostrar_pacientes(sistema)
+            sistema.mostrarPacientes()
         elif opcion == "3":
-            buscar_paciente(sistema)
+            try:
+                doc = int(input("Documento a buscar: "))
+                p = sistema.buscarPaciente(doc)
+                if p:
+                    print(p)
+            except ValueError:
+                print("Error: el documento debe ser un número.")
         elif opcion == "4":
-            atender_paciente(sistema)
+            sistema.atenderSiguiente()
         elif opcion == "5":
             guardar_json(sistema)
         elif opcion == "6":
@@ -108,7 +127,6 @@ def main():
             break
         else:
             print("Opción inválida. Intente de nuevo.")
-
 
 if __name__ == "__main__":
     main()
