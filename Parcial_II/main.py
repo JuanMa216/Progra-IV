@@ -1,22 +1,6 @@
 from models import PacienteGeneral, PacientePrioritario, PacienteUrgencia
-from services import guardarJSON, cargarJSON, pacienteMasCritico
-
-def menu_reportes(sistema):
-    while True:
-        print("\n=============================")
-        print("        REPORTES             ")
-        print("=============================")
-        print("1. Paciente más crítico")
-        print("0. Volver al menú principal")
-        print("=============================")
-        opcion = input("Seleccione una opción: ").strip()
-
-        if opcion == "1":
-            pacienteMasCritico(sistema.pacientes)
-        elif opcion == "0":
-            break
-        else:
-            print("Opción inválida. Intente de nuevo.")
+from services import guardarJSON, cargarJSON
+from services.report_service import menu_reportes, _pacienteMasCritico
 
 
 class Sistema:
@@ -142,7 +126,7 @@ def main():
         elif opcion == "6":
             cargar_json(sistema)
         elif opcion == "7":
-            menu_reportes(sistema)
+            menu_reportes()
         elif opcion == "0":
             print("Saliendo del sistema. ¡Hasta luego!")
             break

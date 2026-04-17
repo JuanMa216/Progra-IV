@@ -1,0 +1,26 @@
+[
+    {
+        "tipo": "PacienteGeneral",
+        "documento": 1245,
+        "nombre": "Julian",
+        "edad": 19,
+        "estadoDeAtencion": "Pendiente",
+        "nombreEps": "Sanitas"
+    },
+    {
+        "tipo": "PacienteUrgencia",
+        "documento": 666,
+        "nombre": "Galvez",
+        "edad": 19,
+        "estadoDeAtencion": "Pendiente",
+        "nivelDeGravedad": "Critico"
+    },
+    {
+        "tipo": "PacientePrioritario",
+        "documento": 444,
+        "nombre": "JuanMa",
+        "edad": 19,
+        "estadoDeAtencion": "Pendiente",
+        "condicionEspecial": "Embarazo"
+    }
+]
